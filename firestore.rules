@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // User profiles for Google, WhatsApp, and Lab users
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if isAuthenticated() || userId.size() > 0;
+      allow delete: if isAuthenticated();
+    }
+
+    // Student Progress documents
+    match /studentProgress/{userId} {
+      allow read: if true;
+      allow write: if isAuthenticated() || userId.size() > 0;
+    }
+
+    // Classroom Sessions
+    match /classroomSessions/{sessionId} {
+      allow read: if true;
+      allow write: if isAuthenticated() || sessionId.size() > 0;
+    }
+  }
+}

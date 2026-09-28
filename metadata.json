@@ -1,0 +1,6 @@
+{
+  "name": "Owrafix Junior Computer School",
+  "description": "A structured 12-week hands-on digital literacy programme designed specifically for Ghanaian basic school computer laboratories.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .btn-chunky-green {
+    background-color: #087443;
+    color: #ffffff;
+    border-bottom: 4px solid #054c2c;
+    transition: all 0.12s ease-in-out;
+  }
+  .btn-chunky-green:hover {
+    background-color: #09834c;
+    transform: translateY(-1px);
+    border-bottom-width: 5px;
+  }
+  .btn-chunky-green:active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+  }
+
+  .btn-chunky-blue {
+    background-color: #2196F3;
+    color: #ffffff;
+    border-bottom: 4px solid #1269B0;
+    transition: all 0.12s ease-in-out;
+  }
+  .btn-chunky-blue:hover {
+    background-color: #3aa3f7;
+    transform: translateY(-1px);
+    border-bottom-width: 5px;
+  }
+  .btn-chunky-blue:active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+  }
+
+  .btn-chunky-white {
+    background-color: #ffffff;
+    color: #001d36;
+    border: 2px solid #D3E9FA;
+    border-bottom: 4px solid #b8dcf5;
+    transition: all 0.12s ease-in-out;
+  }
+  .btn-chunky-white:hover {
+    background-color: #f8fbff;
+    transform: translateY(-1px);
+    border-bottom-width: 5px;
+  }
+  .btn-chunky-white:active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+  }
+
+  .btn-chunky-amber {
+    background-color: #f59e0b;
+    color: #ffffff;
+    border-bottom: 4px solid #b45309;
+    transition: all 0.12s ease-in-out;
+  }
+  .btn-chunky-amber:hover {
+    background-color: #fbbf24;
+    transform: translateY(-1px);
+    border-bottom-width: 5px;
+  }
+  .btn-chunky-amber:active {
+    transform: translateY(3px);
+    border-bottom-width: 1px;
+  }
+}
+
+/* Custom scrollbar for lab simulation windows */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
