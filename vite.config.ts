@@ -5,6 +5,8 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    // GitHub Pages hosts this project at /Owrafix_IT_900/.
+    base: '/Owrafix_IT_900/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
