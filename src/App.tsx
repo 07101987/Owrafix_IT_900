@@ -26,7 +26,7 @@ import { AdminStudentManager } from './components/AdminStudentManager';
 import { CurriculumWeek, UserRole } from './types';
 
 function MainApp() {
-  const { userProfile, role } = useAuth();
+  const { userProfile, role, loginWithGoogle } = useAuth();
   const [, forceRegisterRefresh] = useState(0);
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
   const [isTeacherModalOpen, setIsTeacherModalOpen] = useState(false);
@@ -38,6 +38,8 @@ function MainApp() {
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
   const [activeWeekForModal, setActiveWeekForModal] = useState<CurriculumWeek | null>(null);
   const [selectedWeekNumber, setSelectedWeekNumber] = useState<number>(1);
+  const [googleLoginBusy, setGoogleLoginBusy] = useState(false);
+  const [googleLoginError, setGoogleLoginError] = useState<string | null>(null);
 
   // The Google Sheets registration sync updates the shared applicant array asynchronously.
   useEffect(() => {
@@ -70,6 +72,19 @@ function MainApp() {
     setIsAuthModalOpen(true);
   };
 
+  const handleGoogleLogin = async () => {
+    setGoogleLoginError(null);
+    setGoogleLoginBusy(true);
+    try {
+      await loginWithGoogle('student');
+    } catch (error: any) {
+      console.error('Google sign-in failed:', error);
+      setGoogleLoginError('Google sign-in could not be completed. Please check Firebase Google Sign-In settings.');
+    } finally {
+      setGoogleLoginBusy(false);
+    }
+  };
+
   const handleOpenMouseGame = () => {
     const el = document.getElementById('interfaces-section');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -85,6 +100,31 @@ function MainApp() {
         onOpenHardware={() => setIsHardwareModalOpen(true)}
         onOpenMouseGame={handleOpenMouseGame}
       />
+
+      {!userProfile && (
+        <div className="bg-white border-b border-[#d3e9fa] px-4 py-2.5">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-xs font-semibold">
+            <span className="text-[#17324d]/75">Training Portal Login:</span>
+            <button
+              onClick={handleGoogleLogin}
+              disabled={googleLoginBusy}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-white border-2 border-[#001d36] px-4 py-2 font-extrabold text-[#001d36] shadow-sm hover:bg-[#f8f9ff] disabled:opacity-60 disabled:cursor-wait transition-colors"
+            >
+              <span className="font-black text-[#4285F4]">G</span>
+              <span>{googleLoginBusy ? 'Connecting to Google…' : 'Sign in with Google'}</span>
+            </button>
+            <button
+              onClick={() => handleOpenAuth('student')}
+              className="inline-flex items-center justify-center rounded-xl bg-[#25D366] border-2 border-[#003816] px-4 py-2 font-extrabold text-[#003816] hover:bg-[#20ba59] transition-colors"
+            >
+              WhatsApp / Registration No.
+            </button>
+            {googleLoginError && (
+              <span className="text-[#ba1a1a] text-[11px] font-bold">{googleLoginError}</span>
+            )}
+          </div>
+        </div>
+      )}
 
       {userProfile && (
         <div className="bg-[#eaf7ff] border-b border-[#d3e9fa] py-2 px-4 text-xs font-semibold text-[#0061a4]">
