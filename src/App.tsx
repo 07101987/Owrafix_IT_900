@@ -130,6 +130,17 @@ function MainApp() {
       <StudentTerminalModal isOpen={isStudentModalOpen} onClose={() => setIsStudentModalOpen(false)} initialWeek={selectedWeekNumber} />
       <TeacherProjectorModal isOpen={isTeacherModalOpen} onClose={() => setIsTeacherModalOpen(false)} initialWeek={selectedWeekNumber} />
       <AdminDashboardModal isOpen={isAdminModalOpen} onClose={() => setIsAdminModalOpen(false)} />
+
+      {/* Always-visible admin shortcut while the Admin Portal is open. */}
+      {role === 'admin' && isAdminModalOpen && (
+        <button
+          onClick={() => setIsStudentManagerOpen(true)}
+          className="fixed right-6 top-24 z-[75] rounded-xl bg-[#087443] text-white px-4 py-2.5 shadow-xl border-2 border-white font-extrabold text-xs hover:bg-[#075c36] transition-colors"
+        >
+          Manage Students
+        </button>
+      )}
+
       <AdminStudentManager isOpen={isStudentManagerOpen} onClose={() => setIsStudentManagerOpen(false)} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} defaultRole={authRolePreset} />
       <HardwareGalleryModal isOpen={isHardwareModalOpen} onClose={() => setIsHardwareModalOpen(false)} />
