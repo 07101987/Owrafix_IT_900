@@ -100,20 +100,38 @@ function getActiveApplicants(): RegisteredApplicant[] {
   return live.length ? live : INITIAL_REGISTERED_APPLICANTS;
 }
 
+function applyLiveApplicants(normalized: RegisteredApplicant[]): void {
+  // Keep the exported array reference alive so existing React context consumers
+  // and components that imported INITIAL_REGISTERED_APPLICANTS see the live register.
+  INITIAL_REGISTERED_APPLICANTS.splice(0, INITIAL_REGISTERED_APPLICANTS.length, ...normalized);
+}
+
 export async function refreshRegisteredApplicants(): Promise<RegisteredApplicant[]> {
   if (!GOOGLE_REGISTRATION_API_URL || typeof window === 'undefined') return getActiveApplicants();
 
   try {
     const separator = GOOGLE_REGISTRATION_API_URL.includes('?') ? '&' : '?';
-    const response = await fetch(`${GOOGLE_REGISTRATION_API_URL}${separator}action=list&t=${Date.now()}`, { cache: 'no-store' });
+    const response = await fetch(`${GOOGLE_REGISTRATION_API_URL}${separator}action=list&t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: { Accept: 'application/json' }
+    });
     if (!response.ok) throw new Error(`Registration service returned ${response.status}`);
+
     const payload = await response.json();
-    const records = Array.isArray(payload) ? payload : payload.students;
-    if (!Array.isArray(records)) throw new Error('Registration service returned an invalid student list.');
+    const records = Array.isArray(payload)
+      ? payload
+      : Array.isArray(payload.students)
+        ? payload.students
+        : Array.isArray(payload.data)
+          ? payload.data
+          : [];
+
+    if (!records.length) throw new Error('Registration service returned no student records.');
 
     const normalized = records.map(normalizeApplicant).filter(Boolean) as RegisteredApplicant[];
     if (normalized.length) {
       localStorage.setItem(LIVE_CACHE_KEY, JSON.stringify(normalized));
+      applyLiveApplicants(normalized);
       return normalized;
     }
   } catch (error) {
@@ -145,9 +163,21 @@ function normalizeApplicant(raw: any): RegisteredApplicant | null {
   const enrolmentStatus: RegisteredApplicant['enrolmentStatus'] = rawEnrollment === 'ACTIVE' || rawEnrollment === 'COMPLETED' ? rawEnrollment : 'REGISTERED';
 
   return {
-    regNo, name, phone: normalizedPhone || phone, formattedPhone, displayPhone: String(raw.displayPhone ?? phone),
-    profession: String(raw.profession ?? raw.occupation ?? ''), role, course, courseFee, totalDue, totalPaid, balance,
-    paymentStatus, enrolmentStatus, paymentReference: raw.paymentReference ?? raw.reference ?? undefined,
+    regNo,
+    name,
+    phone: normalizedPhone || phone,
+    formattedPhone,
+    displayPhone: String(raw.displayPhone ?? phone),
+    profession: String(raw.profession ?? raw.occupation ?? ''),
+    role,
+    course,
+    courseFee,
+    totalDue,
+    totalPaid,
+    balance,
+    paymentStatus,
+    enrolmentStatus,
+    paymentReference: raw.paymentReference ?? raw.reference ?? undefined,
     avatarEmoji: role === 'teacher' ? '👨‍🏫' : role === 'admin' ? '🏛️' : '🎒'
   };
 }
