@@ -77,10 +77,6 @@ export const INITIAL_REGISTERED_APPLICANTS: RegisteredApplicant[] = [
   }
 ];
 
-/**
- * The GitHub Pages build receives this from the GitHub Actions secret
- * VITE_GOOGLE_REGISTRATION_API_URL. If it is absent, the offline register is used.
- */
 export const GOOGLE_REGISTRATION_API_URL = import.meta.env.VITE_GOOGLE_REGISTRATION_API_URL || '';
 const LIVE_CACHE_KEY = 'owrafix_live_registered_applicants';
 
@@ -101,9 +97,12 @@ function getActiveApplicants(): RegisteredApplicant[] {
 }
 
 function applyLiveApplicants(normalized: RegisteredApplicant[]): void {
-  // Keep the exported array reference alive so existing React context consumers
-  // and components that imported INITIAL_REGISTERED_APPLICANTS see the live register.
   INITIAL_REGISTERED_APPLICANTS.splice(0, INITIAL_REGISTERED_APPLICANTS.length, ...normalized);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('owrafix:students-updated', {
+      detail: { count: normalized.length }
+    }));
+  }
 }
 
 export async function refreshRegisteredApplicants(): Promise<RegisteredApplicant[]> {
