@@ -22,6 +22,7 @@ import { WeekDetailModal } from './components/WeekDetailModal';
 import { LabConsultationModal } from './components/LabConsultationModal';
 import { AuthModal } from './components/AuthModal';
 import { AdminDashboardModal } from './components/AdminDashboardModal';
+import { AdminStudentManager } from './components/AdminStudentManager';
 import { CurriculumWeek, UserRole } from './types';
 
 function MainApp() {
@@ -30,6 +31,7 @@ function MainApp() {
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
   const [isTeacherModalOpen, setIsTeacherModalOpen] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+  const [isStudentManagerOpen, setIsStudentManagerOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authRolePreset, setAuthRolePreset] = useState<UserRole>('student');
   const [isHardwareModalOpen, setIsHardwareModalOpen] = useState(false);
@@ -38,7 +40,6 @@ function MainApp() {
   const [selectedWeekNumber, setSelectedWeekNumber] = useState<number>(1);
 
   // The Google Sheets registration sync updates the shared applicant array asynchronously.
-  // Listen for that update so the whole portal reflects the latest student register.
   useEffect(() => {
     const handleStudentsUpdated = () => forceRegisterRefresh((value) => value + 1);
     window.addEventListener('owrafix:students-updated', handleStudentsUpdated);
@@ -85,27 +86,30 @@ function MainApp() {
         onOpenMouseGame={handleOpenMouseGame}
       />
 
-      <main className="flex-1">
-        {userProfile && (
-          <div className="bg-[#eaf7ff] border-b border-[#d3e9fa] py-2 px-4 text-xs font-semibold text-[#0061a4]">
-            <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <span>👋 Akwaaba, <strong>{userProfile.displayName}</strong></span>
-                {userProfile.regNo && <span className="bg-[#0061a4] text-white font-mono text-[10px] font-extrabold px-2 py-0.5 rounded-full">{userProfile.regNo}</span>}
-                {userProfile.course && <span className="hidden sm:inline bg-white px-2 py-0.5 rounded-full border border-[#d3e9fa] text-[#001d36] text-[11px] font-bold truncate max-w-[260px]">{userProfile.course}</span>}
-                <span className="bg-[#087443] text-white text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full">{role} Access</span>
-                {userProfile.paymentStatus && <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${userProfile.paymentStatus === 'FULLY PAID' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>{userProfile.paymentStatus}</span>}
-                {userProfile.authProvider === 'whatsapp' && <span className="bg-[#25D366] text-[#003816] text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1"><span>💬</span><span>{userProfile.phoneNumber || 'WhatsApp Verified'}</span></span>}
-              </div>
-              <div className="flex items-center gap-2">
-                {role === 'admin' && <button onClick={() => setIsAdminModalOpen(true)} className="text-[#654800] hover:underline font-bold text-[11px]">🏛️ Open Admin Portal</button>}
-                {role === 'teacher' && <button onClick={() => handleOpenTeacher(1)} className="text-[#087443] hover:underline font-bold text-[11px]">👨‍🏫 Open Projector Deck</button>}
-                {role === 'student' && <button onClick={() => handleOpenStudent(1)} className="text-[#0061a4] hover:underline font-bold text-[11px]">🎒 Open Learning Portal</button>}
-              </div>
+      {userProfile && (
+        <div className="bg-[#eaf7ff] border-b border-[#d3e9fa] py-2 px-4 text-xs font-semibold text-[#0061a4]">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span>👋 Akwaaba, <strong>{userProfile.displayName}</strong></span>
+              {userProfile.regNo && <span className="bg-[#0061a4] text-white font-mono text-[10px] font-extrabold px-2 py-0.5 rounded-full">{userProfile.regNo}</span>}
+              {userProfile.course && <span className="hidden sm:inline bg-white px-2 py-0.5 rounded-full border border-[#d3e9fa] text-[#001d36] text-[11px] font-bold truncate max-w-[260px]">{userProfile.course}</span>}
+              <span className="bg-[#087443] text-white text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full">{role} Access</span>
+              {userProfile.paymentStatus && <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${userProfile.paymentStatus === 'FULLY PAID' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>{userProfile.paymentStatus}</span>}
+              {userProfile.authProvider === 'whatsapp' && <span className="bg-[#25D366] text-[#003816] text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1"><span>💬</span><span>{userProfile.phoneNumber || 'WhatsApp Verified'}</span></span>}
+            </div>
+            <div className="flex items-center gap-3">
+              {role === 'admin' && <>
+                <button onClick={() => setIsAdminModalOpen(true)} className="text-[#654800] hover:underline font-bold text-[11px]">🏛️ Open Admin Portal</button>
+                <button onClick={() => setIsStudentManagerOpen(true)} className="text-[#087443] hover:underline font-bold text-[11px]">➕ Manage Students</button>
+              </>}
+              {role === 'teacher' && <button onClick={() => handleOpenTeacher(1)} className="text-[#087443] hover:underline font-bold text-[11px]">👨‍🏫 Open Projector Deck</button>}
+              {role === 'student' && <button onClick={() => handleOpenStudent(1)} className="text-[#0061a4] hover:underline font-bold text-[11px]">🎒 Open Learning Portal</button>}
             </div>
           </div>
-        )}
+        </div>
+      )}
 
+      <main className="flex-1">
         <Hero onOpenStudent={() => handleOpenStudent(1)} onOpenTeacher={() => handleOpenTeacher(1)} />
         <StatsBar />
         <LearningFormula
@@ -126,6 +130,7 @@ function MainApp() {
       <StudentTerminalModal isOpen={isStudentModalOpen} onClose={() => setIsStudentModalOpen(false)} initialWeek={selectedWeekNumber} />
       <TeacherProjectorModal isOpen={isTeacherModalOpen} onClose={() => setIsTeacherModalOpen(false)} initialWeek={selectedWeekNumber} />
       <AdminDashboardModal isOpen={isAdminModalOpen} onClose={() => setIsAdminModalOpen(false)} />
+      <AdminStudentManager isOpen={isStudentManagerOpen} onClose={() => setIsStudentManagerOpen(false)} />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} defaultRole={authRolePreset} />
       <HardwareGalleryModal isOpen={isHardwareModalOpen} onClose={() => setIsHardwareModalOpen(false)} />
       <WeekDetailModal week={activeWeekForModal} onClose={() => setActiveWeekForModal(null)} onOpenStudent={(wNum) => handleOpenStudent(wNum)} onOpenTeacher={(wNum) => handleOpenTeacher(wNum)} />
