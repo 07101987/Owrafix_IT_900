@@ -78,11 +78,10 @@ export const INITIAL_REGISTERED_APPLICANTS: RegisteredApplicant[] = [
 ];
 
 /**
- * Google Apps Script Web App endpoint. Set this to the deployed /exec URL
- * after deploying google-apps-script/Code.gs. The fallback records above
- * keep the portal usable in an offline classroom.
+ * The GitHub Pages build receives this from the GitHub Actions secret
+ * VITE_GOOGLE_REGISTRATION_API_URL. If it is absent, the offline register is used.
  */
-export const GOOGLE_REGISTRATION_API_URL = '';
+export const GOOGLE_REGISTRATION_API_URL = import.meta.env.VITE_GOOGLE_REGISTRATION_API_URL || '';
 const LIVE_CACHE_KEY = 'owrafix_live_registered_applicants';
 
 function getCachedLiveApplicants(): RegisteredApplicant[] {
