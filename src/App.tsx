@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -26,6 +26,7 @@ import { CurriculumWeek, UserRole } from './types';
 
 function MainApp() {
   const { userProfile, role } = useAuth();
+  const [, forceRegisterRefresh] = useState(0);
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
   const [isTeacherModalOpen, setIsTeacherModalOpen] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
@@ -35,6 +36,14 @@ function MainApp() {
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
   const [activeWeekForModal, setActiveWeekForModal] = useState<CurriculumWeek | null>(null);
   const [selectedWeekNumber, setSelectedWeekNumber] = useState<number>(1);
+
+  // The Google Sheets registration sync updates the shared applicant array asynchronously.
+  // Listen for that update so the whole portal reflects the latest student register.
+  useEffect(() => {
+    const handleStudentsUpdated = () => forceRegisterRefresh((value) => value + 1);
+    window.addEventListener('owrafix:students-updated', handleStudentsUpdated);
+    return () => window.removeEventListener('owrafix:students-updated', handleStudentsUpdated);
+  }, []);
 
   const handleOpenStudent = (weekNum?: number) => {
     if (weekNum) setSelectedWeekNumber(weekNum);
